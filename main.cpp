@@ -5,6 +5,10 @@
 #include <vector>
 #include <curl/curl.h>
 #include <json/json.h>  // JSON library (e.g. libjsoncpp-dev)
+#include <Eigen/Dense>
+
+using Point = Eigen::VectorXd;
+using Neighbor = std::pair<double, Point>; // {distancia, punto}
 
 size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* out) {
     size_t totalSize = size * nmemb;
@@ -40,27 +44,41 @@ std::string send_embedding_request(const std::string& text) {
     return response;
 }
 
-void extract_embedding(const std::string& json_str) {
-    Json::Value root;
-    Json::CharReaderBuilder builder;
-    std::istringstream stream(json_str);
-    std::string errs;
-
-    if (Json::parseFromStream(builder, stream, &root, &errs)) {
-        if (root.isMember("embedding")) {
-            const Json::Value& embedding = root["embedding"];
-            std::cout << "Embedding (dim = " << embedding.size() << "): [";
-            for (unsigned int i = 0; i < embedding.size(); ++i) {
-                std::cout << embedding[i].asFloat();
-                if (i != embedding.size() - 1) std::cout << ", ";
+void extract_embedding(const std::string& json_str,std::vector<Point>& database) {
+    Json::Value jsonData;
+    Json::Reader jsonReader;
+    if (jsonReader.parse(json_str, jsonData)){
+        auto tokens = jsonData[0]["embedding"];
+        std::cout << "# Tokens  = " << tokens.size() << std::endl;
+        for (unsigned int i = 0; i < tokens.size(); ++i) {
+            auto embedding = tokens[i];
+            std::cout << "# Embeddings  = " << embedding.size() << std::endl;
+            Point embedding_vector(embedding.size());
+            for (unsigned int j = 0; j < embedding.size(); ++j) {
+                embedding_vector(i) = embedding[i].asFloat();
             }
-            std::cout << "]" << std::endl;
-        } else {
-            std::cerr << "No 'embedding' field found in response." << std::endl;
+            database.push_back(embedding_vector);        
         }
-    } else {
-        std::cerr << "Failed to parse JSON: " << errs << std::endl;
     }
+    else{
+        std::cout << "Could not parse HTTP data as JSON" << std::endl;
+    }
+}
+
+int find_nearest_neighbor(std::vector<Point>& user_prompt,std::vector<Point>& database){
+    double min_dist=std::numeric_limits<double>::max();
+    int min_index=0;
+    for (unsigned int i = 0; i < user_prompt.size(); ++i) {
+        for (unsigned int j = 0; j < database.size(); ++j) {
+            double dist=(user_prompt[i]-database[j]).squaredNorm();
+            std::cout << "i : "<< i <<", j: "<< j << ", dist: " << dist << std::endl;
+            if (dist<min_dist){
+                min_dist=dist;
+                min_index=j;
+            }
+        }
+    }
+    return min_index;
 }
 
 int main(int argc, char** argv) {
@@ -76,12 +94,35 @@ int main(int argc, char** argv) {
     }
 
     std::string line;
+    std::vector<Point> vector_data;
+    std::vector<Point> user_data;
+    std::vector<std::string> string_data;
     while (std::getline(infile, line)) {
         if (line.empty()) continue;
         std::cout << "Input: " << line << std::endl;
         std::string response = send_embedding_request(line);
-        //extract_embedding(response);
+        string_data.push_back(line);
+        extract_embedding(response,vector_data);
         std::cout << std::endl;
+    }
+    std::cout << "Database size : "<< vector_data.size() << std::endl;
+    
+    while (true) {
+        // get user input
+        printf("\033[32m> \033[0m");
+        std::string user;
+        std::getline(std::cin, user);
+        std::string response = send_embedding_request(user);
+        extract_embedding(response,user_data);
+        std::cout << user_data.size() << std::endl;
+        int nn_index=find_nearest_neighbor(user_data,vector_data);
+        user_data.clear();
+        std::cout << string_data[nn_index] << std::endl;
+        if (user.empty()) {
+            break;
+        }
+
+        
     }
 
     return 0;

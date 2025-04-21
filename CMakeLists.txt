@@ -14,7 +14,7 @@ include_directories(${EIGEN_ROOT_DIR} ${CURL_INCLUDE_DIR} ${JSONCPP_INCLUDE_DIRS
 
 link_directories(${JSONCPP_LIBRARY_DIRS})
 
-add_executable(llama_client main.cpp)
+add_executable(llama_client src/main.cpp)
 
 target_link_libraries(llama_client ${CURL_LIBRARIES} ${JSONCPP_LIBRARIES})
 

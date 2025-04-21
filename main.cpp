@@ -70,9 +70,9 @@ int find_nearest_neighbor(std::vector<Point>& user_prompt,std::vector<Point>& da
     int min_index=0;
     for (unsigned int i = 0; i < user_prompt.size(); ++i) {
         for (unsigned int j = 0; j < database.size(); ++j) {
-            double dist=(user_prompt[i]-database[j]).squaredNorm();
-            std::cout << "i : "<< i <<", j: "<< j << ", dist: " << dist << ", min index: " << min_index << std::endl;
-            if (dist<min_dist){
+            double dist=(user_prompt[i]-database[j]).stableNorm();
+            if (dist>0 and dist<min_dist){
+                std::cout << "i : "<< i <<", j: "<< j << ", dist: " << dist << ", min index: " << min_index << std::endl;
                 min_dist=dist;
                 min_index=j;
             }
@@ -114,7 +114,6 @@ int main(int argc, char** argv) {
         std::getline(std::cin, user);
         std::string response = send_embedding_request(user);
         extract_embedding(response,user_data);
-        std::cout << user_data.size() << std::endl;
         int nn_index=find_nearest_neighbor(user_data,vector_data);
         user_data.clear();
         std::cout << string_data[nn_index] << std::endl;

@@ -71,7 +71,7 @@ int find_nearest_neighbor(std::vector<Point>& user_prompt,std::vector<Point>& da
     for (unsigned int i = 0; i < user_prompt.size(); ++i) {
         for (unsigned int j = 0; j < database.size(); ++j) {
             double dist=(user_prompt[i]-database[j]).squaredNorm();
-            std::cout << "i : "<< i <<", j: "<< j << ", dist: " << dist << std::endl;
+            std::cout << "i : "<< i <<", j: "<< j << ", dist: " << dist << ", min index: " << min_index << std::endl;
             if (dist<min_dist){
                 min_dist=dist;
                 min_index=j;

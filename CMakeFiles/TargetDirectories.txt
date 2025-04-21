@@ -1,3 +1,0 @@
-/Users/sergio/code/kdtree-rag/CMakeFiles/llama_client.dir
-/Users/sergio/code/kdtree-rag/CMakeFiles/edit_cache.dir
-/Users/sergio/code/kdtree-rag/CMakeFiles/rebuild_cache.dir

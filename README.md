@@ -1,3 +1,5 @@
+# KD-Tree Retrieval Augemented Generation
+
 Code example that uses llama.cpp to generate embeddings from a .txt file and uses the Eigen library to handle and manipulate the embedding vectors.
 
 This assumes:

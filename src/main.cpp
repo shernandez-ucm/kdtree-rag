@@ -55,7 +55,7 @@ void extract_embedding(const std::string& json_str,std::vector<Point>& database)
             std::cout << "# Embeddings  = " << embedding.size() << std::endl;
             Point embedding_vector(embedding.size());
             for (unsigned int j = 0; j < embedding.size(); ++j) {
-                embedding_vector(i) = embedding[i].asFloat();
+                embedding_vector(j) = embedding[j].asFloat();
             }
             database.push_back(embedding_vector);        
         }
@@ -65,20 +65,23 @@ void extract_embedding(const std::string& json_str,std::vector<Point>& database)
     }
 }
 
+double cosine_similarity(const Eigen::VectorXd& vec1, const Eigen::VectorXd& vec2) {
+    return vec1.dot(vec2) / (vec1.norm() * vec2.norm());
+}
+
 int find_nearest_neighbor(std::vector<Point>& user_prompt,std::vector<Point>& database){
-    double min_dist=std::numeric_limits<double>::max();
-    int min_index=0;
+    double max_dist=std::numeric_limits<double>::min();
+    int max_index=0;
     for (unsigned int i = 0; i < user_prompt.size(); ++i) {
         for (unsigned int j = 0; j < database.size(); ++j) {
-            double dist=(user_prompt[i]-database[j]).stableNorm();
-            if (dist>0 and dist<min_dist){
-                std::cout << "i : "<< i <<", j: "<< j << ", dist: " << dist << ", min index: " << min_index << std::endl;
-                min_dist=dist;
-                min_index=j;
+            double dist=cosine_similarity(user_prompt[i],database[j]);
+            if (dist>0 and dist>max_dist){
+                max_dist=dist;
+                max_index=j;
             }
         }
     }
-    return min_index;
+    return max_index;
 }
 
 int main(int argc, char** argv) {

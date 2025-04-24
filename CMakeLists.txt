@@ -15,7 +15,8 @@ include_directories(${EIGEN_ROOT_DIR} ${CURL_INCLUDE_DIR} ${JSONCPP_INCLUDE_DIRS
 link_directories(${JSONCPP_LIBRARY_DIRS})
 
 add_executable(llama_client src/llama_client.cpp src/main.cpp)
+add_executable(llama_wikihow src/llama_client.cpp src/wikihow.cpp)
+
 
 target_link_libraries(llama_client ${CURL_LIBRARIES} ${JSONCPP_LIBRARIES})
-
-add_executable(llama_wikihow src/wikihow.cpp)
+target_link_libraries(llama_wikihow ${CURL_LIBRARIES} ${JSONCPP_LIBRARIES})

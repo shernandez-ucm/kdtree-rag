@@ -40,9 +40,9 @@ int main(int argc, char** argv) {
         std::getline(std::cin, user);
         std::string response = send_embedding_request(user);
         extract_embedding(response,user_data);
-        int nn_index=find_nearest_neighbor(user_data,vector_data);
+        std::vector<int> nn_index=find_nearest_neighbor(user_data,vector_data);
         user_data.clear();
-        std::cout << string_data[nn_index] << std::endl;
+        std::cout << string_data[nn_index[0]] << std::endl;
         if (user.empty()) {
             break;
         }

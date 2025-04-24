@@ -69,10 +69,11 @@ double cosine_similarity(const Eigen::VectorXd& vec1, const Eigen::VectorXd& vec
     return vec1.dot(vec2) / (vec1.norm() * vec2.norm());
 }
 
-int find_nearest_neighbor(std::vector<Point>& user_prompt,std::vector<Point>& database){
+std::vector<int> find_nearest_neighbor(std::vector<Point>& user_prompt,std::vector<Point>& database){
     double max_dist=std::numeric_limits<double>::min();
-    int max_index=0;
+    std::vector<int> nearest_neighbors;
     for (unsigned int i = 0; i < user_prompt.size(); ++i) {
+        int max_index=0;
         for (unsigned int j = 0; j < database.size(); ++j) {
             double dist=cosine_similarity(user_prompt[i],database[j]);
             if (dist>0 and dist>max_dist){
@@ -80,6 +81,7 @@ int find_nearest_neighbor(std::vector<Point>& user_prompt,std::vector<Point>& da
                 max_index=j;
             }
         }
+        nearest_neighbors.push_back(max_index);
     }
-    return max_index;
+    return nearest_neighbors;
 }

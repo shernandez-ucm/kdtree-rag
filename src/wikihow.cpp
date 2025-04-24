@@ -3,62 +3,67 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <json/json.h>  // JSON library (e.g. libjsoncpp-dev)
+#include <Eigen/Dense>
+#include "llama_client.h"
+#include <chrono> 
+
+using namespace std::chrono;
 
 struct WikiHowArticle {
-    std::string Title;
-    std::string Headline;
-    std::string Text;
+    std::string Question;
+    std::string Answer;
 };
 
 // Función para leer una línea CSV respetando las comas entre comillas
-std::vector<std::string> parseCSVLine(const std::string& line) {
+WikiHowArticle parseJSONArray(const std::string& line) {
     std::vector<std::string> result;
-    std::stringstream ss(line);
-    std::string field;
-    bool inQuotes = false;
-    char c;
-    std::string value;
-    std::cout << line << std::endl;
-    for (size_t i = 0; i < line.size(); ++i) {
-        c = line[i];
-        if (c == '"') {
-            inQuotes = !inQuotes;
-        } else if (c == ',' && !inQuotes) {
-            result.push_back(value);
-            value.clear();
-        } else {
-            value += c;
-        }
+    Json::CharReaderBuilder readerBuilder;
+    Json::Value root;
+    std::string errs;
+    std::istringstream iss(line);
+    if (!Json::parseFromStream(readerBuilder, iss, &root, &errs)) {
+        std::cerr << "Error parsing JSON: " << errs << std::endl;
     }
-    result.push_back(value);
-    return result;
+    WikiHowArticle article = {
+        root[0].asString(),
+        root[1].asString()
+    };
+    return article;
 }
 
-int main() {
-    std::ifstream file("wikihowAll.csv");
+int main(int argc, char** argv) {
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <text_file.txt>" << std::endl;
+        return 1;
+    }
+    std::ifstream file(argv[1]);
     if (!file.is_open()) {
-        std::cerr << "No se pudo abrir el archivo wikihow.csv" << std::endl;
+        std::cerr << "Failed to open file: " << argv[1] << std::endl;
         return 1;
     }
 
     std::string line;
-    std::getline(file, line); // Leer encabezado
-
+    std::vector<Point> vector_data;
+    std::vector<Point> user_data;
+    std::vector<std::string> string_data;
     int count = 0;
-    while (std::getline(file, line) && count < 5) {
-        std::vector<std::string> fields = parseCSVLine(line);
-        if (fields.size() < 6) continue; // Validar campos
-
-        WikiHowArticle article = {
-            fields[0], fields[1], fields[2]
-        };
-
-        std::cout << "Título: " << article.Title << std::endl;
-        std::cout << "Resumen: " << article.Headline << std::endl;
-        std::cout << "Pasos: " << article.Text << std::endl;
+    while (std::getline(file, line)) {
+        WikiHowArticle article = parseJSONArray(line);
+        std::cout << count << ", Pregunta: " << article.Question << std::endl;
+        std::cout << "Respuesta: " << article.Answer << std::endl;
+        std::string response = send_embedding_request(article.Answer);
+        string_data.push_back(article.Answer);
+        extract_embedding(response,vector_data);
+        std::string question = send_embedding_request(article.Question);
+        extract_embedding(question,user_data);
         ++count;
     }
-
     file.close();
+    auto start1=high_resolution_clock::now();
+    std::vector<int> nn_index = find_nearest_neighbor(user_data,vector_data);
+    auto end1=high_resolution_clock::now();
+    auto search_time=duration_cast<milliseconds>(end1-start1).count();
+    std::cout << "Tiempo :  " << search_time << "[ms]" << std::endl;
     return 0;
 }

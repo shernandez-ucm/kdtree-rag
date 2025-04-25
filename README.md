@@ -15,6 +15,8 @@ The Llama-client requires a working install of Llama.cpp as well as Eigen librar
 
 `sudo apt install libjsoncpp-dev`
 
+`sudo apt install libeigen3-dev`
+
 ## Llama.cpp install
 In order to install Llama.cpp 
 

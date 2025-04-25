@@ -49,10 +49,10 @@ void extract_embedding(const std::string& json_str,std::vector<Point>& database)
     Json::Reader jsonReader;
     if (jsonReader.parse(json_str, jsonData)){
         auto tokens = jsonData[0]["embedding"];
-        std::cout << "# Tokens  = " << tokens.size() << std::endl;
+        //std::cout << "# Tokens  = " << tokens.size() << std::endl;
         for (unsigned int i = 0; i < tokens.size(); ++i) {
             auto embedding = tokens[i];
-            std::cout << "# Embeddings  = " << embedding.size() << std::endl;
+            //std::cout << "# Embeddings  = " << embedding.size() << std::endl;
             Point embedding_vector(embedding.size());
             for (unsigned int j = 0; j < embedding.size(); ++j) {
                 embedding_vector(j) = embedding[j].asFloat();
@@ -70,13 +70,13 @@ double cosine_similarity(const Eigen::VectorXd& vec1, const Eigen::VectorXd& vec
 }
 
 std::vector<int> find_nearest_neighbor(std::vector<Point>& user_prompt,std::vector<Point>& database){
-    double max_dist=std::numeric_limits<double>::min();
     std::vector<int> nearest_neighbors;
     for (unsigned int i = 0; i < user_prompt.size(); ++i) {
         int max_index=0;
+        double max_dist=std::numeric_limits<double>::min();
         for (unsigned int j = 0; j < database.size(); ++j) {
             double dist=cosine_similarity(user_prompt[i],database[j]);
-            if (dist>0 and dist>max_dist){
+            if (dist>max_dist){
                 max_dist=dist;
                 max_index=j;
             }

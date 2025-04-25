@@ -18,7 +18,6 @@ int main(int argc, char** argv) {
         std::cerr << "Failed to open file: " << argv[1] << std::endl;
         return 1;
     }
-
     std::string line;
     std::vector<Point> vector_data;
     std::vector<Point> user_data;

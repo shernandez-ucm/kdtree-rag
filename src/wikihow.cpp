@@ -34,7 +34,7 @@ WikiHowArticle parseJSONArray(const std::string& line) {
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <text_file.txt>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <text_file.jsonl> num_rows" <<  std::endl;
         return 1;
     }
     std::ifstream file(argv[1]);
@@ -42,16 +42,17 @@ int main(int argc, char** argv) {
         std::cerr << "Failed to open file: " << argv[1] << std::endl;
         return 1;
     }
-
+    int n_rows=atoi(argv[2]);
     std::string line;
     std::vector<Point> vector_data;
     std::vector<Point> user_data;
     std::vector<std::string> string_data;
     int count = 0;
     while (std::getline(file, line)) {
+        if (line.empty() || count>n_rows) continue;
         WikiHowArticle article = parseJSONArray(line);
-        std::cout << count << ", Pregunta: " << article.Question << std::endl;
-        std::cout << "Respuesta: " << article.Answer << std::endl;
+        //std::cout << count << ", Pregunta: " << article.Question << std::endl;
+        //std::cout << "Respuesta: " << article.Answer << std::endl;
         std::string response = send_embedding_request(article.Answer);
         string_data.push_back(article.Answer);
         extract_embedding(response,vector_data);

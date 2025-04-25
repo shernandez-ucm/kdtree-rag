@@ -1,4 +1,4 @@
-# KD-Tree Retrieval Augmented Generation
+# Retrieval Augmented Generation using LLama.cpp
 
 Code example that uses llama.cpp to generate embeddings from a .txt file and uses the Eigen library to handle and manipulate the embedding vectors.
 
@@ -8,9 +8,16 @@ This assumes:
 * You have installed Eigen.
 * You are using a recent version of llama.cpp and a model withembedding support (GGUF compatible).
 
-## Llama.cpp install
+## Requeriments
+The Llama-client requires a working install of Llama.cpp as well as Eigen library. 
 
-´
-git clone https://github.com/ggml-org/llama.cpp
-cd llama.cpp
-`
+`sudo apt install libcurl4-openssl-dev`
+
+`sudo apt install libjsoncpp-dev`
+
+## Llama.cpp install
+In order to install Llama.cpp 
+
+`git clone https://github.com/ggml-org/llama.cpp`
+
+`cd llama.cpp`

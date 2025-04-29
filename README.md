@@ -54,3 +54,7 @@ Use Llama_client on the cat-facts dataset.
 `cd ~/kdtree-rag`
 
 `./llama_client data/cat-facts.txt`
+
+Now you can interact with the dataset. 
+
+![LLama_client on the Cat Facts Dataset](cat-facts.png)

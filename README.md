@@ -39,6 +39,7 @@ In order to install Llama.cpp
 `cd kdtree-rag`
 
 `cmake ./`
+
 `make`
 
 ## Test RAG

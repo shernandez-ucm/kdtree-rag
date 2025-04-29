@@ -25,6 +25,7 @@ In order to install Llama.cpp
 `cd llama.cpp`
 
 `cmake -B build`
+
  `cmake --build build --config Release`
 
 ## Clone KD-Tree RAG
